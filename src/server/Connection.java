@@ -33,4 +33,12 @@ public class Connection implements Runnable {
             } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+" run}: "+e.getMessage());}
         }
     }
+
+    public boolean disconnect() {
+        try {
+            client.close();
+            return true;
+        } catch (IOException e) {server.log(3, "{Connection disconnect}: "+e.getMessage());}
+        return false;
+    }
 }
