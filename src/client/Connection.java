@@ -19,16 +19,24 @@ public class Connection {
 
 
     public String read() {
-        try {
-            return input.readUTF();
-        } catch (IOException e) {log(3, "{Connection read}: "+e.getMessage());}
+        if (server != null && server.isConnected()) {
+            try {
+                return input.readUTF();
+            } catch (IOException e) {log(3, "{Connection read}: "+e.getMessage());}
+        } else {
+            log(2, "{Connection read}: Not connected to Server can't read!");
+        }
         return "";
     }
 
     public void write(String text) {
-        try {
-            output.writeUTF(text);
-        } catch (IOException e) {log(3, "{Connection write}: "+e.getMessage());}
+        if (server != null && server.isConnected()) {
+            try {
+                output.writeUTF(text);
+            } catch (IOException e) {log(3, "{Connection write}: "+e.getMessage());}
+        } else {
+            log(2, "{Connection write}: Not connected to Server can't write!");
+        }
     }
 
     public boolean connectToLocal() {
@@ -40,9 +48,18 @@ public class Connection {
             server = new Socket(ip, port);
             input = new DataInputStream(server.getInputStream());
             output = new DataOutputStream(server.getOutputStream());
+            log(1, "{Connection connectTo}: Connected to Server: " + server.getRemoteSocketAddress() + ".");
         } catch (IOException e) {log(3, "{Connection connectTo}: "+e.getMessage());}
 
         return server.isConnected();
+    }
+
+    public boolean disconnect() {
+        try {
+            server.close();
+            return true;
+        } catch (IOException e) {log(3, "{Connection disconnect}: "+e.getMessage());}
+        return false;
     }
 
     public void log(int type, String log) {
