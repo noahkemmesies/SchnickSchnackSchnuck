@@ -19,7 +19,7 @@ public class Server {
             } catch (IOException e) {log(3, "{Server}: "+e.getMessage());}
             clients = new ArrayList<>();
             clientThreads = new ArrayList<>();
-            log(1,"Server ist auf Port " + server.getLocalPort() + " gestartet und wartet auf clients.");
+            log(1,"{Server}: Server ist auf Port " + server.getLocalPort() + " gestartet und wartet auf clients.");
             connect();
         }
 
@@ -27,17 +27,17 @@ public class Server {
         private void connect() {
             while (true) {
                 try {
-                    Connection c = new Connection(server.accept());
+                    Connection c = new Connection(this, server.accept());
                     clients.add(c);
                     Thread t = new Thread(c);
                     clientThreads.add(t);
                     t.start();
-                    log(1, "Client " + clients.indexOf(c) + ", " + c.getClient().getRemoteSocketAddress() +" just connected and is ready for communication.");
-                } catch (IOException e) {log(3, "{connect}: "+e.getMessage());}
+                    log(1, "{Server connect}: Client " + clients.indexOf(c) + ", " + c.getClient().getRemoteSocketAddress() +" just connected and is ready for communication.");
+                } catch (IOException e) {log(3, "{Server connect}: "+e.getMessage());}
             }
         }
 
-        public void log(int type, String log) {
+        public void log(int type, String log) { //Formatierung: "{Class method}: Message"
             String time = ""+ LocalTime.now();
             switch (type){
                 case 1:
