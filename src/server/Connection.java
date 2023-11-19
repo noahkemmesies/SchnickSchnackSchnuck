@@ -27,18 +27,46 @@ public class Connection implements Runnable {
 
     public void run() {
         while (true) {
+            String message = read();
+            if (message.equals("~~disconnected~~")) {
+                break;
+            } else {
+                System.out.println(message);
+            }
+        }
+    }
+
+    public String read() {
+        if (client != null && client.isConnected()) {
             try {
-                String test = input.readUTF();
-                System.out.println(test);
-            } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+" run}: "+e.getMessage());}
+                String temp = input.readUTF();
+                if (temp.equals("~~disconnect~~") && disconnect()) {
+                    return "~~disconnected~~";
+                }
+                return temp;
+            } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+" read}: "+e.getMessage());}
+        } else {
+            server.log(2, "{Connection: "+client.getRemoteSocketAddress()+" read}: Not connected to Server can't read!");
+        }
+        return "";
+    }
+
+    public void write(String text) {
+        if (client != null && client.isConnected()) {
+            try {
+                output.writeUTF(text);
+            } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+" write}: "+e.getMessage());}
+        } else {
+            server.log(2, "{Connection: "+client.getRemoteSocketAddress()+" write}: Not connected to Server can't write!");
         }
     }
 
     public boolean disconnect() {
         try {
             client.close();
+            server.log(1, "{Connection: "+client.getRemoteSocketAddress()+" disconnect}: successfully disconnected");
             return true;
-        } catch (IOException e) {server.log(3, "{Connection disconnect}: "+e.getMessage());}
+        } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+"  disconnect}: "+e.getMessage());}
         return false;
     }
 }
