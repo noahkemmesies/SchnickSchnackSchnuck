@@ -56,7 +56,9 @@ public class Connection {
 
     public boolean disconnect() {
         try {
+            write("~~disconnect~~");
             server.close();
+            log(1, "{Connection: disconnect}: successfully disconnected from: " + server.getRemoteSocketAddress() + ".");
             return true;
         } catch (IOException e) {log(3, "{Connection disconnect}: "+e.getMessage());}
         return false;
