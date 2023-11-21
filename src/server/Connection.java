@@ -27,7 +27,7 @@ public class Connection implements Runnable {
 
     public void run() {
         while (true) {
-            String message = read();
+            String message = readSmart();
             if (message.equals("~~disconnected~~")) {
                 break;
             } else {
@@ -36,14 +36,18 @@ public class Connection implements Runnable {
         }
     }
 
+    public String readSmart() {
+        String temp = read();
+        if (temp.equals("~~disconnect~~") && disconnect()) {
+            return "~~disconnected~~";
+        }
+        return temp;
+    }
+
     public String read() {
         if (client != null && client.isConnected()) {
             try {
-                String temp = input.readUTF();
-                if (temp.equals("~~disconnect~~") && disconnect()) {
-                    return "~~disconnected~~";
-                }
-                return temp;
+                return input.readUTF();
             } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+" read}: "+e.getMessage());}
         } else {
             server.log(2, "{Connection: "+client.getRemoteSocketAddress()+" read}: Not connected to Server can't read!");
