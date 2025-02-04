@@ -6,15 +6,31 @@ import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalTime;
 
-public class Connection {
+public class Connection extends Thread {
 
     private Socket server;
     private DataInputStream input;
     private DataOutputStream output;
+    private final SchnickSchnackSchnuck schnickSchnackSchnuck;
 
 
-    public Connection() {
+    public Connection(SchnickSchnackSchnuck schnickSchnackSchnuck) {
+        this.schnickSchnackSchnuck = schnickSchnackSchnuck;
+    }
 
+    public void run() {
+        while (true) {
+            String temp = read();
+            try {
+                if (temp == null) {
+                    Thread.sleep(500);
+                } else {
+                    schnickSchnackSchnuck.receive(temp);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e); //update to log
+            }
+        }
     }
 
 
@@ -51,7 +67,7 @@ public class Connection {
             log(1, "{Connection connectTo}: Connected to Server: " + server.getRemoteSocketAddress() + ".");
         } catch (IOException e) {log(3, "{Connection connectTo}: "+e.getMessage());}
 
-        return server.isConnected();
+        return server != null && server.isConnected();
     }
 
     public boolean disconnect() {
@@ -68,16 +84,16 @@ public class Connection {
         String time = ""+ LocalTime.now();
         switch (type){
             case 1:
-                System.out.println("Info["+ time.substring(0, 5) +"]: "+log);
+                System.out.println("Info ["+ time.substring(0, 5) +"]: "+log);
                 break;
             case 2:
-                System.out.println("Warning["+ time.substring(0, 5) +"]: "+log);
+                System.out.println("Warn ["+ time.substring(0, 5) +"]: "+log);
                 break;
             case 3:
-                System.out.println("Error["+ time.substring(0, 5) +"]: "+log);
+                System.out.println("Error ["+ time.substring(0, 5) +"]: "+log);
                 break;
             default:
-                System.out.println("Unknown log-type["+ time.substring(0, 5) +"]: "+log);
+                System.out.println("Unknown log-type ["+ time.substring(0, 5) +"]: "+log);
         }
     }
 }
