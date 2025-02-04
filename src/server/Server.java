@@ -28,6 +28,10 @@ public class Server {
             while (true) {
                 try {
                     Connection c = new Connection(this, server.accept());
+                    if (clients.size() >= 2) {
+                        log(2, "{Server connect}: Client " + clients.indexOf(c) + ", " + c.getClient().getRemoteSocketAddress() +" tried to connect, but there are already two players.");
+                        continue;
+                    }
                     clients.add(c);
                     Thread t = new Thread(c);
                     clientThreads.add(t);
@@ -37,20 +41,28 @@ public class Server {
             }
         }
 
+        public void handleCommunication(Connection connection, String message) {
+            for (Connection c : clients) {
+                if (c != connection) {
+                    c.write(message);
+                }
+            }
+        }
+
         public void log(int type, String log) { //Formatierung: "{Class method}: Message"
             String time = ""+ LocalTime.now();
             switch (type){
                 case 1:
-                    System.out.println("Info["+ time.substring(0, 5) +"]: "+log);
+                    System.out.println("Info ["+ time.substring(0, 5) +"]: "+log);
                     break;
                 case 2:
-                    System.out.println("Warning["+ time.substring(0, 5) +"]: "+log);
+                    System.out.println("Warn ["+ time.substring(0, 5) +"]: "+log);
                     break;
                 case 3:
-                    System.out.println("Error["+ time.substring(0, 5) +"]: "+log);
+                    System.out.println("Error ["+ time.substring(0, 5) +"]: "+log);
                     break;
                 default:
-                    System.out.println("Unknown log-type["+ time.substring(0, 5) +"]: "+log);
+                    System.out.println("Unknown log-type ["+ time.substring(0, 5) +"]: "+log);
             }
         }
 

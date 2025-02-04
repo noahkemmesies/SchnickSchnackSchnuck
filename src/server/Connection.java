@@ -31,7 +31,11 @@ public class Connection implements Runnable {
             if (message.equals("~~disconnected~~")) {
                 break;
             } else {
-                System.out.println(message);
+                if (message.equalsIgnoreCase("schere") || message.equalsIgnoreCase("stein") || message.equalsIgnoreCase("papier")) {
+                    server.handleCommunication(this, message);
+                } else {
+                    server.log(3, "{Connection: "+client.getRemoteSocketAddress()+"}: invalid message for: " + message);
+                }
             }
         }
     }
@@ -50,7 +54,7 @@ public class Connection implements Runnable {
                 return input.readUTF();
             } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+" read}: "+e.getMessage());}
         } else {
-            server.log(2, "{Connection: "+client.getRemoteSocketAddress()+" read}: Not connected to Server can't read!");
+            server.log(2, "{Connection: "+ (client != null ? client.getRemoteSocketAddress() : "unknown RemoteSocketAddress") +" read}: Not connected to Server can't read!");
         }
         return "";
     }
@@ -61,7 +65,7 @@ public class Connection implements Runnable {
                 output.writeUTF(text);
             } catch (IOException e) {server.log(3, "{Connection: "+client.getRemoteSocketAddress()+" write}: "+e.getMessage());}
         } else {
-            server.log(2, "{Connection: "+client.getRemoteSocketAddress()+" write}: Not connected to Server can't write!");
+            server.log(2, "{Connection: "+ (client != null ? client.getRemoteSocketAddress() : "unknown RemoteSocketAddress") +" write}: Not connected to Server can't write!");
         }
     }
 
