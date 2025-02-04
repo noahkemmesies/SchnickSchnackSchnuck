@@ -28,7 +28,7 @@ public class Connection extends Thread {
                     schnickSchnackSchnuck.receive(temp);
                 }
             } catch (InterruptedException e) {
-                throw new RuntimeException(e); //update to log
+                log(3, "{Connection run}: "+e.getMessage());
             }
         }
     }
