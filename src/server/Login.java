@@ -7,6 +7,7 @@ public class Login {
             return 1;
         }
         if (clientCount == 1) {
+            c.write("start");
             server.handleCommunication(c, "start");
         }
         if (clientCount >= 2) {
