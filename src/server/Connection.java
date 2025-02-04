@@ -69,7 +69,7 @@ public class Connection implements Runnable {
         }
     }
 
-    public boolean disconnect() {
+    public boolean disconnect() { //also remove from server connection arraylist
         try {
             client.close();
             server.log(1, "{Connection: "+client.getRemoteSocketAddress()+" disconnect}: successfully disconnected");

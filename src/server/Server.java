@@ -2,12 +2,12 @@ package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.StandardSocketOptions;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class Server {
     private ServerSocket server;
+    private final Login login;
     private final ArrayList<Connection> clients;
     private final ArrayList<Thread> clientThreads;
 
@@ -20,6 +20,7 @@ public class Server {
             clients = new ArrayList<>();
             clientThreads = new ArrayList<>();
             log(1,"{Server}: Server ist auf Port " + server.getLocalPort() + " gestartet und wartet auf clients.");
+            this.login = new Login();
             connect();
         }
 
@@ -28,8 +29,13 @@ public class Server {
             while (true) {
                 try {
                     Connection c = new Connection(this, server.accept());
-                    if (clients.size() >= 2) {
-                        log(2, "{Server connect}: Client " + clients.indexOf(c) + ", " + c.getClient().getRemoteSocketAddress() +" tried to connect, but there are already two players.");
+                    int i = login.newClient(this, c, clients.size());
+                    if (i == 0) {
+                        log(1, "{Server connect}: Client " + clients.indexOf(c) + ", " + c.getClient().getRemoteSocketAddress() + " connected and the game begins.");
+                    } else if (i == 1) {
+                        log(1, "{Server connect}: Client " + clients.indexOf(c) + ", " + c.getClient().getRemoteSocketAddress() + " connected and is waiting for a second player.");
+                    } else if (i == 2) {
+                        log(2, "{Server connect}: Client " + clients.indexOf(c) + ", " + c.getClient().getRemoteSocketAddress() + " tried to connect, but there are already two players.");
                         continue;
                     }
                     clients.add(c);
